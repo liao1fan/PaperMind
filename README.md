@@ -43,6 +43,8 @@ python web_server.py
 ```
 Open browser to `http://localhost:5000` and use the web interface.
 
+![Web Interface](./web_server.png)
+
 ## Architecture
 
 ```
