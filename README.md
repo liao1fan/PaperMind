@@ -31,11 +31,17 @@ Edit `.env` with your credentials (OpenAI API key, Notion token, etc.)
 
 ### 3. Run
 
+**CLI mode:**
 ```bash
 python chat.py
 ```
-
 Provide a paper link (Xiaohongshu URL, arXiv link, or PDF URL).
+
+**Web interface:**
+```bash
+python web_server.py
+```
+Open browser to `http://localhost:5000` and use the web interface.
 
 ## Architecture
 
@@ -67,6 +73,7 @@ Notion Database
 ├── .env.example
 ├── paper_agents.py          # Agent definitions
 ├── chat.py                  # CLI entry point
+├── web_server.py            # Web interface entry point
 ├── init_model.py            # LLM config
 ├── pdffigures2/pdffigures2.jar
 ├── src/
