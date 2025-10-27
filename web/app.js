@@ -334,17 +334,17 @@ function addMessage(role, content) {
             const newMessageContent = document.createElement('div');
             newMessageContent.className = 'message-content';
 
+            // 如果有日志容器，先添加日志（显示在上面）
+            if (logContainer) {
+                logContainer.removeAttribute('id'); // 移除临时 ID
+                newMessageContent.appendChild(logContainer);
+            }
+
             const messageText = document.createElement('div');
             messageText.className = 'message-text';
             messageText.textContent = content;
 
             newMessageContent.appendChild(messageText);
-
-            // 如果有日志容器，将其添加到新消息中
-            if (logContainer) {
-                logContainer.removeAttribute('id'); // 移除临时 ID
-                newMessageContent.appendChild(logContainer);
-            }
 
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(newMessageContent);

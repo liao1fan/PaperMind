@@ -183,7 +183,7 @@ class NotionImageUploader:
 
         Args:
             file_upload_id: Notion 文件上传 ID
-            caption: 图片说明文字（可选）
+            caption: 图片说明文字（可选，支持HTML标签如<strong>）
             alt_text: 图片描述文字（可选）
 
         Returns:
@@ -201,20 +201,10 @@ class NotionImageUploader:
 
         # 添加 caption（如果提供）
         if caption:
-            block["image"]["caption"] = [
-                {
-                    "type": "text",
-                    "text": {"content": caption[:1000]},  # Notion 限制
-                    "annotations": {
-                        "bold": False,
-                        "italic": True,
-                        "strikethrough": False,
-                        "underline": False,
-                        "code": False,
-                        "color": "default"
-                    }
-                }
-            ]
+            # 将 HTML 格式的 caption 转换为 Notion rich text
+            rich_text = NotionImageUploader._html_to_rich_text(caption)
+            if rich_text:
+                block["image"]["caption"] = rich_text
 
         return block
 
@@ -247,22 +237,112 @@ class NotionImageUploader:
 
         # 添加 caption
         if caption:
-            block["image"]["caption"] = [
-                {
+            # 将 HTML 格式的 caption 转换为 Notion rich text
+            rich_text = NotionImageUploader._html_to_rich_text(caption)
+            if rich_text:
+                block["image"]["caption"] = rich_text
+
+        return block
+
+    @staticmethod
+    def _html_to_rich_text(html_text: str) -> List[Dict]:
+        """
+        将 HTML 格式的文本转换为 Notion rich text 格式
+
+        支持的 HTML 标签：
+        - <strong> 或 <b>: 加粗
+        - <em> 或 <i>: 斜体
+        - <code>: 代码
+
+        Args:
+            html_text: HTML 格式的文本
+
+        Returns:
+            Notion rich text 数组
+        """
+        import re
+        from html import unescape
+
+        # 模式：匹配 HTML 标签
+        tag_pattern = r'<(strong|b|em|i|code)>(.*?)</\1>'
+
+        rich_text_list = []
+        last_end = 0
+
+        for match in re.finditer(tag_pattern, html_text, re.DOTALL):
+            tag_name = match.group(1)
+            tag_content = unescape(match.group(2))
+
+            # 添加标签前的纯文本
+            if match.start() > last_end:
+                plain_text = unescape(html_text[last_end:match.start()])
+                if plain_text:
+                    rich_text_list.append({
+                        "type": "text",
+                        "text": {"content": plain_text},
+                        "annotations": {
+                            "bold": False,
+                            "italic": False,
+                            "strikethrough": False,
+                            "underline": False,
+                            "code": False,
+                            "color": "default"
+                        }
+                    })
+
+            # 添加标签内的文本（带样式）
+            is_bold = tag_name in ('strong', 'b')
+            is_italic = tag_name in ('em', 'i')
+            is_code = tag_name == 'code'
+
+            rich_text_list.append({
+                "type": "text",
+                "text": {"content": tag_content},
+                "annotations": {
+                    "bold": is_bold,
+                    "italic": is_italic,
+                    "strikethrough": False,
+                    "underline": False,
+                    "code": is_code,
+                    "color": "default"
+                }
+            })
+
+            last_end = match.end()
+
+        # 添加最后剩余的纯文本
+        if last_end < len(html_text):
+            remaining_text = unescape(html_text[last_end:])
+            if remaining_text:
+                rich_text_list.append({
                     "type": "text",
-                    "text": {"content": caption[:1000]},
+                    "text": {"content": remaining_text},
                     "annotations": {
                         "bold": False,
-                        "italic": True,
+                        "italic": False,
                         "strikethrough": False,
                         "underline": False,
                         "code": False,
                         "color": "default"
                     }
-                }
-            ]
+                })
 
-        return block
+        # 如果没有匹配到任何标签，返回纯文本
+        if not rich_text_list:
+            rich_text_list.append({
+                "type": "text",
+                "text": {"content": unescape(html_text)},
+                "annotations": {
+                    "bold": False,
+                    "italic": False,
+                    "strikethrough": False,
+                    "underline": False,
+                    "code": False,
+                    "color": "default"
+                }
+            })
+
+        return rich_text_list
 
 
 def create_image_blocks_from_markdown(

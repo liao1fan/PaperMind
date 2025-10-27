@@ -89,6 +89,22 @@ def websocket_broadcast_processor(logger, method_name, event_dict):
     log_level = event_dict.get('level', 'info')
     event_msg = event_dict.get('event', '')
 
+    # Extract additional context fields (除了 structlog 的内部字段)
+    excluded_keys = {'event', 'level', 'timestamp', 'logger', 'exc_info', 'stack_info'}
+    extra_fields = {k: v for k, v in event_dict.items() if k not in excluded_keys}
+
+    # Format extra fields as key=value pairs
+    extra_str = ''
+    if extra_fields:
+        extra_parts = []
+        for k, v in extra_fields.items():
+            # 格式化值：字符串加引号，其他类型直接转字符串
+            if isinstance(v, str):
+                extra_parts.append(f"{k}='{v}'")
+            else:
+                extra_parts.append(f"{k}={v}")
+        extra_str = ' ' + ' '.join(extra_parts)
+
     # Format the log message with timestamp
     timestamp = event_dict.get('timestamp', '')
     if timestamp:
@@ -100,9 +116,9 @@ def websocket_broadcast_processor(logger, method_name, event_dict):
         except:
             timestamp_str = timestamp[:19]
 
-        formatted_msg = f"{timestamp_str} [{log_level:5}] {event_msg}"
+        formatted_msg = f"{timestamp_str} [{log_level:5}] {event_msg}{extra_str}"
     else:
-        formatted_msg = f"[{log_level:5}] {event_msg}"
+        formatted_msg = f"[{log_level:5}] {event_msg}{extra_str}"
 
     # Determine log type for frontend
     if log_level in ('error', 'critical'):
@@ -392,13 +408,6 @@ async def process_chat(message: str, session_id: str = "default"):
         # 添加用户消息到上下文
         input_items.append({"role": "user", "content": message})
 
-        # 发送开始消息
-        await manager.broadcast({
-            "type": "log",
-            "level": "info",
-            "message": "🤖 开始处理您的请求..."
-        })
-
         # 使用 Runner.run() 执行，传入完整上下文
         result = await Runner.run(
             starting_agent=current_agent,
@@ -619,11 +628,11 @@ if __name__ == "__main__":
         exit(1)
 
     logger.info("启动 Web 服务器...")
-    logger.info(f"访问地址: http://localhost:9999")
+    logger.info(f"访问地址: http://localhost:9997")
 
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=9999,
+        port=9997,
         log_level="info"
     )
