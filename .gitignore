@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Environment Variables
+.env
+
+# Data & Logs
+data/
+logs/
+*.db
+*.db-journal
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Distribution
+dist/
+build/
+*.egg-info/
+
+# Project directories with sensitive info
+specs/
+.claude/
+.specify/
+
+# Third-party tools (keep structure, ignore source code)
+pdffigures2/pdffigures2/
+pdffigures2/paper_digest/
+!pdffigures2/README.md
+!pdffigures2/pdffigures2.jar
+
+# Node modules
+node_modules/
+package-lock.json
+
+# Generated PDFs and extracted images (user data)
+paper_digest/pdfs/
+paper_digest/outputs/
+paper_digest/images/
+!paper_digest/pdfs/.gitkeep
+!paper_digest/outputs/.gitkeep
+!paper_digest/images/.gitkeep
