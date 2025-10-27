@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112">
+  <defs>
+    <linearGradient id="spiralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+    <linearGradient id="innerFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eef0ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#e5e7f9" stop-opacity="0.8"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(1,1) scale(0.982142857) translate(24,31)">
+    <g transform="translate(32,49) scale(4) translate(-32,-32)">
+      <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 18 Q 36 18 32 16 Z"
+            fill="url(#innerFill)" opacity="0.95"/>
+      <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 18 Q 36 18 32 16"
+            fill="none" stroke="url(#spiralGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <line x1="26" y1="23" x2="38" y2="23" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+      <line x1="26" y1="27" x2="34" y2="27" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+      <line x1="26" y1="31" x2="36" y2="31" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+    </g>
+  </g>
+</svg>

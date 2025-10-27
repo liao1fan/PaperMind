@@ -299,6 +299,7 @@ function addLogMessage(message, level = 'info') {
             logContainer = document.createElement('div');
             logContainer.id = 'current-log-container';
             logContainer.className = 'log-container';
+            logContainer.dataset.persistent = 'true'; // 标记为持久化容器
             messageContent.appendChild(logContainer);
         }
     }
@@ -316,14 +317,50 @@ function addLogMessage(message, level = 'info') {
 function addMessage(role, content) {
     // 移除输入中指示器
     if (role === 'assistant') {
-        removeTypingIndicator();
-        // 移除临时日志容器标记
-        const currentLog = document.getElementById('current-log-container');
-        if (currentLog) {
-            currentLog.removeAttribute('id');
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) {
+            // 获取 typing indicator 中的所有内容（包括日志）
+            const messageContent = typingIndicator.querySelector('.message-content');
+            const logContainer = messageContent.querySelector('#current-log-container');
+
+            // 创建新的 assistant 消息
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = 'AI';
+
+            const newMessageContent = document.createElement('div');
+            newMessageContent.className = 'message-content';
+
+            const messageText = document.createElement('div');
+            messageText.className = 'message-text';
+            messageText.textContent = content;
+
+            newMessageContent.appendChild(messageText);
+
+            // 如果有日志容器，将其添加到新消息中
+            if (logContainer) {
+                logContainer.removeAttribute('id'); // 移除临时 ID
+                newMessageContent.appendChild(logContainer);
+            }
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(newMessageContent);
+
+            // 替换 typing indicator
+            typingIndicator.replaceWith(messageDiv);
+
+            // 保存消息
+            state.messages.push({ role, content });
+
+            scrollToBottom();
+            return messageDiv;
         }
     }
 
+    // 普通消息（用户消息或没有 typing indicator 的情况）
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${role}`;
 

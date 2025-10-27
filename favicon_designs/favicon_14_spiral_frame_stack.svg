@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad14" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="url(#grad14)"/>
+  <!-- Spiral Frame -->
+  <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 24 Q 36 30 32 30"
+        fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+  <!-- Stacked Papers Inside (3 layers) -->
+  <rect x="27" y="24" width="10" height="8" rx="0.5" fill="white" opacity="0.5"/>
+  <rect x="28" y="26" width="10" height="8" rx="0.5" fill="white" opacity="0.7"/>
+  <rect x="29" y="28" width="10" height="8" rx="0.5" fill="white" opacity="0.95"/>
+  <line x1="30.5" y1="31" x2="37.5" y2="31" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/>
+  <line x1="30.5" y1="33" x2="37.5" y2="33" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/>
+  <!-- Dot at spiral end -->
+  <circle cx="32" cy="30" r="1.5" fill="white"/>
+</svg>

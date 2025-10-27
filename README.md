@@ -2,6 +2,11 @@
 
 Intelligent research paper management system. Extract papers from Xiaohongshu/arXiv/PDF, organize metadata, extract figures, generate bilingual summaries, and save to Notion.
 
+## Requirements
+
+- Python 3.10+
+- Java 11+ (for PDFFigures2 figure extraction)
+
 ## Quick Start
 
 ### 1. Install PDFFigures2 (Figure Extraction)
@@ -122,7 +127,7 @@ export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 
 ## Tech Stack
 
-- **Framework**: OpenAI Agents SDK + Python 3.11+
+- **Framework**: OpenAI Agents SDK + Python 3.10+
 - **Figure Extraction**: PDFFigures2 (Java) + PyMuPDF fallback
 - **Database**: Notion API
 - **HTTP**: httpx (async)

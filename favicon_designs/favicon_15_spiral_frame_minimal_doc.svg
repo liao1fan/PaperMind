@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad15" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="url(#grad15)"/>
+  <!-- Spiral Frame -->
+  <path d="M 32 12 Q 46 12 46 26 Q 46 40 32 40 Q 18 40 18 26 Q 18 14 28 14 Q 38 14 38 26 Q 38 34 32 34"
+        fill="none" stroke="white" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" opacity="0.93"/>
+  <!-- Minimal Document Icon (simple rectangle with top bar) -->
+  <rect x="27" y="21" width="10" height="13" rx="0.8" fill="none" stroke="white" stroke-width="1.8" opacity="0.9"/>
+  <line x1="27" y1="24" x2="37" y2="24" stroke="white" stroke-width="1.8" opacity="0.9"/>
+  <!-- Small lines inside -->
+  <line x1="29" y1="27" x2="35" y2="27" stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.85"/>
+  <line x1="29" y1="30" x2="33" y2="30" stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.85"/>
+  <!-- Dot at spiral end -->
+  <circle cx="32" cy="34" r="1.5" fill="white"/>
+</svg>

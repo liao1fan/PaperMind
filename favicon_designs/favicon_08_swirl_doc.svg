@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad8" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="url(#grad8)"/>
+  <!-- Document Shape -->
+  <path d="M 20 18 Q 20 14 24 14 L 40 14 Q 44 14 44 18 L 44 46 Q 44 50 40 50 L 24 50 Q 20 50 20 46 Z" fill="white"/>
+  <!-- Swirl inside -->
+  <path d="M 28 24 Q 32 20 36 24 Q 36 28 32 30 Q 28 30 28 26"
+        fill="none" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+</svg>

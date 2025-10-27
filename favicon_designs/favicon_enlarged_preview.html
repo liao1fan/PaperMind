@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>放大版Favicon预览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .preview-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .preview-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .preview-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .icon-display {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+        }
+
+        .copy-btn.copied {
+            background: #10a37f;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-width: 600px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .info-box p {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 放大版Favicon预览</h1>
+
+    <div class="preview-container">
+        <div class="preview-item">
+            <div class="preview-label">原始版本 (64x64 viewBox, scale=1)</div>
+            <div class="icon-display">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">
+                    <defs>
+                        <linearGradient id="spiralGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                        <linearGradient id="innerFill1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#eef0ff" stop-opacity="0.95"/>
+                            <stop offset="100%" stop-color="#e5e7f9" stop-opacity="0.8"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 18 Q 36 18 32 16 Z"
+                          fill="url(#innerFill1)" opacity="0.95"/>
+                    <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 18 Q 36 18 32 16"
+                          fill="none" stroke="url(#spiralGrad1)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="26" y1="23" x2="38" y2="23" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+                    <line x1="26" y1="27" x2="34" y2="27" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+                    <line x1="26" y1="31" x2="36" y2="31" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="preview-item">
+            <div class="preview-label">放大版本 (viewBox="-20 -20 104 104", scale=3.2, 下移17)</div>
+            <div class="icon-display">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 112" width="128" height="128">
+                <defs>
+                    <linearGradient id="spiralGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="100%" stop-color="#764ba2"/>
+                    </linearGradient>
+                    <linearGradient id="innerFill2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#eef0ff" stop-opacity="0.95"/>
+                    <stop offset="100%" stop-color="#e5e7f9" stop-opacity="0.8"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- 先平移到[0,0]，再整体留下 m=1 的边距，并按比例缩放到(112-2m) -->
+                <!-- m = 1px,  缩放系数 k = (112-2m)/112 = 110/112 = 0.982142857 -->
+                <g transform="translate(1,1) scale(0.982142857) translate(24,31)">
+                    <g transform="translate(32,49) scale(4) translate(-32,-32)">
+                    <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 18 Q 36 18 32 16 Z"
+                            fill="url(#innerFill2)" opacity="0.95"/>
+                    <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 18 Q 36 18 32 16"
+                            fill="none" stroke="url(#spiralGrad2)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="26" y1="23" x2="38" y2="23" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+                    <line x1="26" y1="27" x2="34" y2="27" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+                    <line x1="26" y1="31" x2="36" y2="31" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+                    </g>
+                </g>
+                </svg>
+
+            </div>
+        </div>
+
+        <button class="copy-btn" onclick="copySVG()">复制放大版SVG代码</button>
+
+        <div class="info-box">
+            <h3>📐 技术说明</h3>
+            <p><strong>缩放系数：</strong><code>s = 3.2</code></p>
+            <p><strong>调整后viewBox：</strong><code>viewBox="-20 -20 104 104"</code></p>
+            <p><strong>垂直位移：</strong>下移 17 单位 (0.85 × 上边缘高度)</p>
+            <p>通过扩大viewBox并应用更大的缩放变换，图标会占据大部分空间。图标整体下移17个单位，使其视觉重心更加平衡。</p>
+        </div>
+    </div>
+
+    <script>
+        function copySVG() {
+            const svgCode = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-20 -20 104 104">
+  <defs>
+    <linearGradient id="spiralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+    <linearGradient id="innerFill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eef0ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#e5e7f9" stop-opacity="0.8"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(32,49) scale(3.2) translate(-32,-32)">
+    <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 18 Q 36 18 32 16 Z"
+          fill="url(#innerFill)" opacity="0.95"/>
+    <path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 18 Q 36 18 32 16"
+          fill="none" stroke="url(#spiralGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="26" y1="23" x2="38" y2="23" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+    <line x1="26" y1="27" x2="34" y2="27" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+    <line x1="26" y1="31" x2="36" y2="31" stroke="#7a85e4" stroke-width="2" stroke-linecap="round" opacity="0.95"/>
+  </g>
+</svg>`;
+
+            navigator.clipboard.writeText(svgCode).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '已复制 ✓';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                alert('复制失败，请手动复制');
+            });
+        }
+    </script>
+</body>
+</html>

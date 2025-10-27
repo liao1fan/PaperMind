@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperMind Favicon 设计预览</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .design-number {
+            font-size: 0.9em;
+            color: #667eea;
+            font-weight: 600;
+            background: #f0f4ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+        }
+
+        .copy-btn.copied {
+            background: #10a37f;
+        }
+
+        .preview-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .design-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .design-description {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .design-elements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .element-tag {
+            background: #f0f0f0;
+            color: #667eea;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .footer {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            color: white;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer h3 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 PaperMind Favicon 设计</h1>
+        <p class="subtitle">精选20款简洁专业的图标设计 | 前10款为基础设计，第11-15款为螺旋框+文档V1，第16-20款为优化版V2</p>
+
+        <div class="grid" id="designGrid"></div>
+
+        <div class="footer">
+            <h3>💡 使用方法</h3>
+            <p>点击"复制"按钮复制对应的favicon代码，粘贴到HTML的 &lt;head&gt; 中</p>
+        </div>
+    </div>
+
+    <script>
+        const designs = [
+            {
+                name: "极简螺旋",
+                description: "单线条螺旋，极致简洁，富有生命力",
+                elements: ["螺旋", "极简", "线条"],
+                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="grad10" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect width="64" height="64" rx="12" fill="url(#grad10)"/><path d="M 32 16 Q 40 16 40 24 Q 40 32 32 32 Q 24 32 24 24 Q 24 18 28 18 Q 32 18 32 22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="22" r="1.5" fill="white"/></svg>'
+            },
+            {
+                name: "螺旋框+文档线条",
+                description: "螺旋作为外框，内部为简洁文档线条，和谐统一",
+                elements: ["螺旋框", "文档线", "融合"],
+                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="grad11" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect width="64" height="64" rx="12" fill="url(#grad11)"/><path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 24 Q 36 30 32 30" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/><line x1="26" y1="24" x2="38" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/><line x1="26" y1="28" x2="34" y2="28" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/><line x1="26" y1="32" x2="36" y2="32" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/><circle cx="32" cy="30" r="1.5" fill="white"/></svg>'
+            },
+            {
+                name: "螺旋框+文档图标",
+                description: "螺旋作为外框，内部为完整小文档图标，层次分明",
+                elements: ["螺旋框", "文档图标", "层次"],
+                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="grad12" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect width="64" height="64" rx="12" fill="url(#grad12)"/><path d="M 32 12 Q 46 12 46 26 Q 46 40 32 40 Q 18 40 18 26 Q 18 14 28 14 Q 38 14 38 26 Q 38 34 32 34" fill="none" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/><rect x="28" y="22" width="8" height="11" rx="0.5" fill="white" opacity="0.9"/><line x1="29.5" y1="25" x2="34.5" y2="25" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/><line x1="29.5" y1="27.5" x2="34.5" y2="27.5" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/><line x1="29.5" y1="30" x2="33" y2="30" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/><circle cx="32" cy="34" r="1.5" fill="white"/></svg>'
+            },
+            {
+                name: "螺旋框+折角文档",
+                description: "螺旋外框包裹折角文档，细节丰富设计感强",
+                elements: ["螺旋框", "折角", "设计感"],
+                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="grad13" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect width="64" height="64" rx="12" fill="url(#grad13)"/><path d="M 32 13 Q 45 13 45 26 Q 45 39 32 39 Q 19 39 19 26 Q 19 15 27 15 Q 35 15 35 24 Q 35 31 32 31" fill="none" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/><path d="M 27 22 L 27 33 L 37 33 L 37 26 L 34 22 Z" fill="white" opacity="0.88"/><path d="M 34 22 L 34 26 L 37 26 Z" fill="#667eea" opacity="0.5"/><line x1="29" y1="27" x2="34" y2="27" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/><line x1="29" y1="29.5" x2="35" y2="29.5" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/><circle cx="32" cy="31" r="1.5" fill="white"/></svg>'
+            },
+            {
+                name: "螺旋框+堆叠文档",
+                description: "螺旋外框内堆叠多层文档，突出批量处理能力",
+                elements: ["螺旋框", "堆叠", "批量"],
+                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="grad14" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect width="64" height="64" rx="12" fill="url(#grad14)"/><path d="M 32 14 Q 44 14 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 16 28 16 Q 36 16 36 24 Q 36 30 32 30" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/><rect x="27" y="24" width="10" height="8" rx="0.5" fill="white" opacity="0.5"/><rect x="28" y="26" width="10" height="8" rx="0.5" fill="white" opacity="0.7"/><rect x="29" y="28" width="10" height="8" rx="0.5" fill="white" opacity="0.95"/><line x1="30.5" y1="31" x2="37.5" y2="31" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/><line x1="30.5" y1="33" x2="37.5" y2="33" stroke="#667eea" stroke-width="0.8" stroke-linecap="round"/><circle cx="32" cy="30" r="1.5" fill="white"/></svg>'
+            },
+            {
+                name: "螺旋框+极简文档",
+                description: "螺旋外框+空心文档图标，极致简约现代感",
+                elements: ["螺旋框", "空心", "极简"],
+                svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="grad15" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect width="64" height="64" rx="12" fill="url(#grad15)"/><path d="M 32 12 Q 46 12 46 26 Q 46 40 32 40 Q 18 40 18 26 Q 18 14 28 14 Q 38 14 38 26 Q 38 34 32 34" fill="none" stroke="white" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" opacity="0.93"/><rect x="27" y="21" width="10" height="13" rx="0.8" fill="none" stroke="white" stroke-width="1.8" opacity="0.9"/><line x1="27" y1="24" x2="37" y2="24" stroke="white" stroke-width="1.8" opacity="0.9"/><line x1="29" y1="27" x2="35" y2="27" stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.85"/><line x1="29" y1="30" x2="33" y2="30" stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.85"/><circle cx="32" cy="34" r="1.5" fill="white"/></svg>'
+            },
+            {
+                name: "螺旋框+文档线v2",
+                description: "螺旋外框+空心文档图标，极致简约现代感",
+                elements: ["螺旋框", "空心", "极简"],
+                svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+                <defs>
+                    <linearGradient id="grad11" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#667eea"/>
+                    <stop offset="100%" stop-color="#764ba2"/>
+                    </linearGradient>
+                </defs>
+                <rect width="64" height="64" rx="12" fill="url(#grad11)"/>
+                <path d="M 32 14
+                        Q 44 14 44 26
+                        Q 44 38 32 38
+                        Q 20 38 20 26
+                        Q 20 16 28 16
+                        Q 36 16 36 18
+                        Q 36 18 32 16"
+                        fill="none"
+                        stroke="white"
+                        stroke-width="2.5"
+                        stroke-linecap="butt"
+                        stroke-linejoin="round"
+                        opacity="0.9"/>
+                <line x1="26" y1="24" x2="38" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+                <line x1="26" y1="28" x2="34" y2="28" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+                <line x1="26" y1="32" x2="36" y2="32" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.85"/>
+                </svg>`
+            }
+
+
+        ];
+
+        function copyToClipboard(button, index) {
+            const design = designs[index];
+            const encoded = btoa(unescape(encodeURIComponent(design.svg)));
+            const dataUri = `data:image/svg+xml;base64,${encoded}`;
+            const htmlCode = `<link rel="icon" href="${dataUri}">`;
+
+            navigator.clipboard.writeText(htmlCode).then(() => {
+                button.textContent = '已复制 ✓';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = '复制';
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                alert('复制失败');
+            });
+        }
+
+        function renderDesigns() {
+            const grid = document.getElementById('designGrid');
+
+            designs.forEach((design, i) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const elementsHtml = design.elements.map(el =>
+                    `<span class="element-tag">${el}</span>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="design-number">设计 ${String(i+1).padStart(2, '0')}</span>
+                        <button class="copy-btn" onclick="copyToClipboard(this, ${i})">复制</button>
+                    </div>
+                    <div class="preview-area">
+                        ${design.svg}
+                    </div>
+                    <div class="design-name">${design.name}</div>
+                    <div class="design-description">${design.description}</div>
+                    <div class="design-elements">${elementsHtml}</div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        renderDesigns();
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad9" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="url(#grad9)"/>
+  <!-- Document -->
+  <rect x="16" y="16" width="24" height="32" rx="1" fill="white" opacity="0.9"/>
+  <!-- Lines -->
+  <line x1="20" y1="24" x2="36" y2="24" stroke="#667eea" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="20" y1="30" x2="36" y2="30" stroke="#667eea" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Circle Badge (bottom right) -->
+  <circle cx="44" cy="42" r="6" fill="white" stroke="#667eea" stroke-width="1.5"/>
+  <circle cx="44" cy="42" r="2" fill="#667eea"/>
+</svg>

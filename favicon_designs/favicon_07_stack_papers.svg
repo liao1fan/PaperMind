@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad7" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="url(#grad7)"/>
+  <!-- Stack of Papers -->
+  <rect x="20" y="32" width="24" height="16" rx="1" fill="white" opacity="0.7"/>
+  <rect x="20" y="28" width="24" height="16" rx="1" fill="white" opacity="0.85"/>
+  <rect x="20" y="24" width="24" height="16" rx="1" fill="white"/>
+  <!-- Lines on top paper -->
+  <line x1="24" y1="30" x2="40" y2="30" stroke="#667eea" stroke-width="1" stroke-linecap="round"/>
+  <line x1="24" y1="34" x2="40" y2="34" stroke="#667eea" stroke-width="1" stroke-linecap="round"/>
+</svg>

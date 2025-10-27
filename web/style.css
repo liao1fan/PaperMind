@@ -286,7 +286,7 @@ body {
 
 /* Message Bubbles */
 .message {
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     display: flex;
     gap: 16px;
     max-width: 900px;
@@ -331,11 +331,17 @@ body {
 
 .message-content {
     flex: 1;
-    padding-top: 6px;
+    padding: 16px 20px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .message.user .message-content {
     color: var(--text-primary);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+    border-color: rgba(99, 102, 241, 0.2);
 }
 
 .message.assistant .message-content {
@@ -346,6 +352,7 @@ body {
 .message-text {
     white-space: pre-wrap;
     word-wrap: break-word;
+    margin-bottom: 0;
 }
 
 /* Typing Indicator */

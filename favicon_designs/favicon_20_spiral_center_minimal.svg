@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="grad20" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="url(#grad20)"/>
+  <!-- Spiral Frame (end point stays near top edge) -->
+  <path d="M 32 10 Q 48 10 48 26 Q 48 42 32 42 Q 16 42 16 26 Q 16 10 32 10 Q 44 10 44 26 Q 44 38 32 38 Q 20 38 20 26 Q 20 14 28 14"
+        fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+  <!-- Minimal Document Icon in Center (高度14，y从25到39，中心在32，完美居中) -->
+  <rect x="26" y="25" width="12" height="14" rx="1" fill="none" stroke="white" stroke-width="2" opacity="0.95"/>
+  <line x1="26" y1="29" x2="38" y2="29" stroke="white" stroke-width="2" opacity="0.95"/>
+  <!-- Small lines inside -->
+  <line x1="28" y1="31.5" x2="36" y2="31.5" stroke="white" stroke-width="0.9" stroke-linecap="round" opacity="0.9"/>
+  <line x1="28" y1="34.5" x2="34" y2="34.5" stroke="white" stroke-width="0.9" stroke-linecap="round" opacity="0.9"/>
+  <!-- Dot at spiral end (near top) -->
+  <circle cx="28" cy="14" r="1.5" fill="white"/>
+</svg>
