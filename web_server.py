@@ -234,11 +234,26 @@ class DigestRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     message: str
+    session_id: Optional[str] = "default"
+    history: Optional[list] = None  # 前端发送的完整历史上下文
+    notion_integration_secret: Optional[str] = None
+    notion_database_id: Optional[str] = None
+
+class ResetSessionRequest(BaseModel):
+    session_id: str
+
+class RestoreSessionRequest(BaseModel):
+    session_id: str
+    messages: list
 
 class DigestResponse(BaseModel):
     success: bool
     message: str
     task_id: Optional[str] = None
+
+class NotionTestRequest(BaseModel):
+    notion_integration_secret: str
+    notion_database_id: str
 
 # 自定义日志处理器，用于将日志发送到 WebSocket
 class WebSocketLogHandler(logging.Handler):
@@ -275,6 +290,16 @@ async def login_js():
     """返回登录 JavaScript 文件"""
     return FileResponse("web/login.js", media_type="application/javascript")
 
+@app.get("/settings")
+async def settings_page():
+    """返回设置页面"""
+    return FileResponse("web/settings.html")
+
+@app.get("/settings.js")
+async def settings_js():
+    """返回设置 JavaScript 文件"""
+    return FileResponse("web/settings.js", media_type="application/javascript")
+
 @app.get("/style.css")
 async def get_css():
     """返回 CSS 文件"""
@@ -303,16 +328,25 @@ async def websocket_endpoint(websocket: WebSocket):
 async def chat(request: ChatRequest):
     """
     聊天接口 - 接收用户消息并通过 WebSocket 返回 Agent 响应
+    支持从前端传递 Notion 配置、session_id 和历史上下文
     """
     message = request.message.strip()
 
     if not message:
         raise HTTPException(status_code=400, detail="消息不能为空")
 
-    logger.info(f"收到聊天消息: {message}")
+    session_id = request.session_id or "default"
 
-    # 在后台启动处理任务
-    asyncio.create_task(process_chat(message))
+    logger.info(f"收到聊天消息: {message}, session_id: {session_id}")
+
+    # 在后台启动处理任务，传递 Notion 配置、session_id 和历史上下文
+    asyncio.create_task(process_chat(
+        message,
+        session_id=session_id,
+        history=request.history,  # 传递前端发送的历史上下文
+        notion_integration_secret=request.notion_integration_secret,
+        notion_database_id=request.notion_database_id
+    ))
 
     return {"success": True, "message": "消息已提交"}
 
@@ -389,9 +423,22 @@ class WebSocketLogCapture(logging.Handler):
             # 调试：打印错误
             print(f"日志发送失败: {e}")
 
-async def process_chat(message: str, session_id: str = "default"):
+async def process_chat(
+    message: str,
+    session_id: str = "default",
+    history: Optional[list] = None,
+    notion_integration_secret: Optional[str] = None,
+    notion_database_id: Optional[str] = None
+):
     """
     处理聊天消息的后台函数 - 使用 Runner.run() 维护对话上下文
+
+    Args:
+        message: 用户消息
+        session_id: 会话ID（从前端传递）
+        history: 前端发送的完整历史上下文（优先于后端内存中的历史）
+        notion_integration_secret: Notion Integration Secret (可选，优先使用用户配置)
+        notion_database_id: Notion Database ID (可选，优先使用用户配置)
 
     注意：日志已通过 structlog 的 websocket_broadcast_processor 处理，
     无需再添加额外的 logging handler，以避免日志重复显示。
@@ -399,20 +446,60 @@ async def process_chat(message: str, session_id: str = "default"):
     # 设置全局广播函数，供 structlog processor 使用
     set_log_broadcast_func(manager.broadcast)
 
+    # 设置环境变量（临时覆盖，仅在当前请求中生效）
+    original_env = {}
+    try:
+        if notion_integration_secret:
+            original_env['NOTION_INTEGRATION_SECRET'] = os.environ.get('NOTION_INTEGRATION_SECRET')
+            os.environ['NOTION_INTEGRATION_SECRET'] = notion_integration_secret
+            logger.info("使用用户配置的 Notion Integration Secret")
+
+        if notion_database_id:
+            original_env['NOTION_DATABASE_ID'] = os.environ.get('NOTION_DATABASE_ID')
+            os.environ['NOTION_DATABASE_ID'] = notion_database_id
+            logger.info("使用用户配置的 Notion Database ID")
+
+    except Exception as e:
+        logger.warning(f"设置环境变量失败: {e}")
+
     try:
         # 获取会话上下文
         session = conversation_manager.get_session(session_id)
         current_agent = session["agent"]
-        input_items = session["input_items"]
+
+        # 使用前端发送的历史上下文（如果有），优先级高于后端内存中的历史
+        if history is not None and isinstance(history, list) and len(history) > 0:
+            # 前端已经发送了完整的历史上下文，使用前端的数据
+            input_items = []
+            for msg in history:
+                if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                    input_items.append({
+                        "role": msg.get("role"),
+                        "content": msg.get("content")
+                    })
+            logger.info(f"[DEBUG] 使用前端发送的历史上下文 - session_id: {session_id}")
+            logger.info(f"[DEBUG] 前端历史消息数: {len(input_items)}")
+        else:
+            # 使用后端内存中的历史
+            input_items = session["input_items"]
+            logger.info(f"[DEBUG] 使用后端内存的历史上下文 - session_id: {session_id}")
+            logger.info(f"[DEBUG] 后端历史消息数: {len(input_items)}")
+
+        logger.info(f"[DEBUG] 历史消息内容: {input_items}")
 
         # 添加用户消息到上下文
+        # 重要: 确保输入消息格式正确 - {"role": "user", "content": message}
         input_items.append({"role": "user", "content": message})
+        logger.info(f"[DEBUG] 添加新消息后，总消息数: {len(input_items)}")
 
         # 使用 Runner.run() 执行，传入完整上下文
+        # max_turns: 增加到 100 以支持更复杂的任务
+        # 每个"turn"是一次 Agent-LLM 交互，论文处理通常需要多个步骤
+        # (搜索 -> 下载 -> 提取文本 -> 提取图片 -> 创建 Notion 页面等)
         result = await Runner.run(
             starting_agent=current_agent,
             input=input_items,
-            max_turns=20
+            max_turns=50
         )
 
         # 更新会话状态
@@ -459,6 +546,13 @@ async def process_chat(message: str, session_id: str = "default"):
             "type": "done"
         })
     finally:
+        # 恢复原始环境变量
+        for key, value in original_env.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+
         # 清除全局广播函数
         set_log_broadcast_func(None)
 
@@ -608,6 +702,198 @@ def extract_title(message: str) -> Optional[str]:
         return lines[0].strip()
 
     return None
+
+@app.post("/api/test-notion-connection")
+async def test_notion_connection(request: NotionTestRequest):
+    """
+    测试 Notion 连接
+    """
+    try:
+        from notion_client import AsyncClient
+
+        # 验证参数
+        if not request.notion_integration_secret or not request.notion_database_id:
+            raise HTTPException(status_code=400, detail="Integration Secret 和 Database ID 不能为空")
+
+        # 创建客户端并测试连接
+        client = AsyncClient(auth=request.notion_integration_secret)
+
+        # 尝试查询数据库信息
+        database = await client.databases.retrieve(database_id=request.notion_database_id)
+
+        await client.aclose()
+
+        # 提取数据库标题
+        database_title = "未命名"
+        if database.get("title"):
+            title_parts = database["title"]
+            if title_parts and len(title_parts) > 0:
+                database_title = title_parts[0].get("plain_text", "未命名")
+
+        # 提取数据库字段信息
+        properties = database.get("properties", {})
+        fields = []
+        for field_name, field_data in properties.items():
+            field_type = field_data.get("type", "unknown")
+            fields.append({
+                "name": field_name,
+                "type": field_type
+            })
+
+        logger.info(f"Notion 连接测试成功: {database_title}, 字段数量: {len(fields)}")
+
+        return {
+            "success": True,
+            "database_title": database_title,
+            "fields": fields,
+            "message": "连接成功"
+        }
+
+    except Exception as e:
+        logger.error(f"Notion 连接测试失败: {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@app.post("/api/reset-session")
+async def reset_session(request: ResetSessionRequest):
+    """
+    重置会话 - 清除指定会话的上下文
+    """
+    try:
+        session_id = request.session_id
+        conversation_manager.reset_session(session_id)
+        logger.info(f"会话已重置: {session_id}")
+        return {"success": True, "message": f"会话 {session_id} 已重置"}
+    except Exception as e:
+        logger.error(f"重置会话失败: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/restore-session")
+async def restore_session(request: RestoreSessionRequest):
+    """
+    恢复会话 - 从前端消息重建会话上下文
+    """
+    try:
+        session_id = request.session_id
+        messages = request.messages
+
+        logger.info(f"[DEBUG] 收到恢复会话请求: session_id={session_id}")
+        logger.info(f"[DEBUG] 收到的消息数量: {len(messages)}")
+        logger.info(f"[DEBUG] 消息内容: {messages}")
+
+        # 将前端消息转换为 input_items 格式
+        input_items = []
+        for msg in messages:
+            # 只提取 role 和 content 字段
+            if isinstance(msg, dict) and "role" in msg and "content" in msg:
+                input_items.append({
+                    "role": msg.get("role"),
+                    "content": msg.get("content")
+                })
+
+        logger.info(f"[DEBUG] 转换后的 input_items 数量: {len(input_items)}")
+        logger.info(f"[DEBUG] input_items 内容: {input_items}")
+
+        # 获取或创建会话
+        session = conversation_manager.get_session(session_id)
+        session["input_items"] = input_items
+        session["agent"] = paper_agent
+
+        logger.info(f"✅ 会话已恢复: {session_id}, 消息数: {len(input_items)}")
+        return {
+            "success": True,
+            "message": f"会话 {session_id} 已恢复",
+            "message_count": len(input_items)
+        }
+    except Exception as e:
+        logger.error(f"恢复会话失败: {e}", exc_info=True)
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/initialize-notion-database")
+async def initialize_notion_database(request: NotionTestRequest):
+    """
+    自动为 Notion Database 添加所需字段（如果不存在）
+    """
+    try:
+        from notion_client import AsyncClient
+
+        # 验证参数
+        if not request.notion_integration_secret or not request.notion_database_id:
+            raise HTTPException(status_code=400, detail="Integration Secret 和 Database ID 不能为空")
+
+        logger.info("开始初始化 Notion Database 字段...")
+
+        # 创建客户端
+        client = AsyncClient(auth=request.notion_integration_secret)
+
+        # 获取当前数据库的字段
+        database = await client.databases.retrieve(database_id=request.notion_database_id)
+        existing_properties = database.get("properties", {})
+
+        # 定义需要的字段（基于 paper_digest.py 中的字段）
+        required_fields = {
+            "Name": {"title": {}},  # 标题字段（必须存在）
+            "Authors": {"rich_text": {}},
+            "Affiliations": {"rich_text": {}},
+            "Venue": {"rich_text": {}},
+            "Abstract": {"rich_text": {}},
+            "Keywords": {"multi_select": {"options": []}},
+            "ArXiv ID": {"rich_text": {}},
+            "Publication Date": {"date": {}},
+            "Other Resources": {"rich_text": {}},
+            "PDF Link": {"url": {}},
+            "Source URL": {"url": {}}
+        }
+
+        # 检查缺失的字段
+        missing_fields = {}
+        for field_name, field_config in required_fields.items():
+            if field_name not in existing_properties:
+                missing_fields[field_name] = field_config
+                logger.info(f"发现缺失字段: {field_name}")
+
+        if not missing_fields:
+            logger.info("所有必需字段已存在，无需初始化")
+            await client.aclose()
+            return {
+                "success": True,
+                "message": "所有必需字段已存在",
+                "added_fields": [],
+                "existing_fields": list(existing_properties.keys())
+            }
+
+        # 添加缺失的字段
+        logger.info(f"准备添加 {len(missing_fields)} 个缺失字段...")
+
+        # 构建更新请求 - 只添加新字段，不修改现有字段
+        update_properties = dict(existing_properties)  # 保留现有字段
+        update_properties.update(missing_fields)  # 添加缺失字段
+
+        # 更新数据库 schema
+        await client.databases.update(
+            database_id=request.notion_database_id,
+            properties=update_properties
+        )
+
+        await client.aclose()
+
+        logger.info(f"✅ 成功添加 {len(missing_fields)} 个字段到 Notion Database")
+
+        return {
+            "success": True,
+            "message": f"成功添加 {len(missing_fields)} 个字段",
+            "added_fields": list(missing_fields.keys()),
+            "existing_fields": list(existing_properties.keys())
+        }
+
+    except Exception as e:
+        logger.error(f"初始化 Notion Database 失败: {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
 
 @app.get("/health")
 async def health_check():
