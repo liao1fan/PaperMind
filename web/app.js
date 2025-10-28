@@ -128,7 +128,7 @@ function deleteConversation(sessionId, event) {
     }
 }
 
-// 编辑会话标题
+// 编辑会话标题（内联编辑）
 function editConversationTitle(sessionId, event) {
     if (event) {
         event.stopPropagation();
@@ -137,19 +137,65 @@ function editConversationTitle(sessionId, event) {
     const conversation = state.conversations.find(c => c.id === sessionId);
     if (!conversation) return;
 
-    const newTitle = prompt('请输入新的会话名称:', conversation.title);
+    // 找到标题元素
+    const titleElement = event.target.closest('.chat-history-item').querySelector('.chat-history-item-title');
+    if (!titleElement) return;
 
-    // 用户取消或输入空白
-    if (newTitle === null || newTitle.trim() === '') {
-        return;
-    }
+    // 保存原始标题
+    const originalTitle = conversation.title;
 
-    // 更新标题
-    conversation.title = newTitle.trim();
-    conversation.lastMessageTime = Date.now();
+    // 创建输入框
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = originalTitle;
+    input.className = 'chat-history-item-title-input';
 
-    saveConversationList();
-    renderConversationList();
+    // 替换标题为输入框
+    titleElement.style.display = 'none';
+    titleElement.parentElement.insertBefore(input, titleElement);
+
+    // 聚焦并选中文本
+    input.focus();
+    input.select();
+
+    // 保存编辑
+    const saveEdit = () => {
+        const newTitle = input.value.trim();
+
+        if (newTitle && newTitle !== originalTitle) {
+            conversation.title = newTitle;
+            conversation.lastMessageTime = Date.now();
+            saveConversationList();
+        }
+
+        // 恢复标题显示
+        titleElement.textContent = conversation.title;
+        titleElement.style.display = '';
+        input.remove();
+    };
+
+    // 取消编辑
+    const cancelEdit = () => {
+        titleElement.style.display = '';
+        input.remove();
+    };
+
+    // 监听事件
+    input.addEventListener('blur', saveEdit);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveEdit();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelEdit();
+        }
+    });
+
+    // 阻止点击输入框时触发会话切换
+    input.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
 }
 
 // 切换会话
