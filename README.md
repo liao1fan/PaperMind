@@ -9,7 +9,7 @@ Intelligent research paper management system. Extract papers from Xiaohongshu/ar
 
 ## Quick Start
 
-### 1. Install PDFFigures2 (Figure Extraction)
+### 1. Install Java (Required for PDFFigures2)
 
 **macOS:**
 ```bash
@@ -23,7 +23,29 @@ source ~/.zshrc
 sudo apt-get install openjdk-11-jdk
 ```
 
-### 2. Setup
+### 2. Install PDFFigures2 (Figure Extraction)
+
+PDFFigures2 is a Java tool for extracting figures from PDF papers. Follow these steps:
+
+```bash
+# Navigate to the pdffigures2 directory
+cd pdffigures2
+
+# Follow the installation instructions in pdffigures2/README.md
+# This typically involves:
+# - Building from source with Maven (if not already compiled)
+# - Or downloading the pre-compiled JAR file
+
+# Key points:
+# - The JAR file should be at: pdffigures2/pdffigures2/pdffigures2.jar
+# - Requires Java 11+ installed and in your PATH
+# - After installation, return to the project root:
+cd ..
+```
+
+For detailed PDFFigures2 setup, see `pdffigures2/README.md`
+
+### 3. Setup
 
 ```bash
 python3 -m venv .venv
@@ -117,7 +139,26 @@ brew install openjdk@11
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 ```
 
-**PDFFigures2 jar missing:** Verify `pdffigures2/pdffigures2/pdffigures2.jar` exists
+**PDFFigures2 installation issues:**
+```bash
+# Navigate to pdffigures2 directory
+cd pdffigures2
+
+# Check pdffigures2/README.md for installation steps
+# Usually involves Maven build or downloading pre-compiled JAR
+cat README.md
+
+# After installation, verify JAR exists
+ls -la pdffigures2/pdffigures2.jar
+
+# Return to project root
+cd ..
+```
+
+**PDFFigures2 jar missing or not found:**
+- Verify JAR exists at: `pdffigures2/pdffigures2/pdffigures2.jar`
+- Follow installation steps in `pdffigures2/README.md`
+- Ensure Java 11+ is installed: `java -version`
 
 **Notion connection failed:**
 - Check NOTION_TOKEN starts with `ntn_`
