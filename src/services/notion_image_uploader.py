@@ -20,17 +20,17 @@ logger = logging.getLogger(__name__)
 class NotionImageUploader:
     """Notion 图片上传器"""
 
-    def __init__(self, notion_token: str):
+    def __init__(self, notion_integration_secret: str):
         """
         初始化上传器
 
         Args:
-            notion_token: Notion API token
+            notion_integration_secret: Notion Integration Secret
         """
-        self.notion_token = notion_token
+        self.notion_integration_secret = notion_integration_secret
         self.base_url = "https://api.notion.com/v1"
         self.headers = {
-            "Authorization": f"Bearer {notion_token}",
+            "Authorization": f"Bearer {notion_integration_secret}",
             "Notion-Version": "2022-06-28",
             "Content-Type": "application/json",
         }
@@ -109,7 +109,7 @@ class NotionImageUploader:
                     send_response = await client.post(
                         f"{self.base_url}/file_uploads/{file_upload_id}/send",
                         headers={
-                            "Authorization": f"Bearer {self.notion_token}",
+                            "Authorization": f"Bearer {self.notion_integration_secret}",
                             "Notion-Version": "2022-06-28",
                         },
                         files={"file": (image_filename, f, content_type)}

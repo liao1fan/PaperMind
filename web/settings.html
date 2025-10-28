@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置 - PaperMind</title>
+    <link rel="stylesheet" href="style.css?v=2.5">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v=2.5">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(103, 126, 234, 0.1);
+            color: #677eea;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(103, 126, 234, 0.2);
+        }
+
+        .settings-header h1 {
+            font-size: 28px;
+            margin: 0;
+            color: #2d3748;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .settings-card h2 {
+            font-size: 18px;
+            margin: 0 0 16px 0;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-card p {
+            color: #718096;
+            font-size: 14px;
+            margin: 0 0 16px 0;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #677eea;
+            box-shadow: 0 0 0 3px rgba(103, 126, 234, 0.1);
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .save-button, .test-button {
+            flex: 1;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .save-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .save-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(103, 126, 234, 0.4);
+        }
+
+        .save-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .test-button {
+            background: white;
+            color: #677eea;
+            border: 1px solid #677eea;
+        }
+
+        .test-button:hover {
+            background: rgba(103, 126, 234, 0.1);
+        }
+
+        .test-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .status-message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .status-message.info {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 1px solid #90cdf4;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spinner 0.6s linear infinite;
+        }
+
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+
+        .env-source {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .env-source.from-user {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .env-source.from-env {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        /* 数据库字段显示 */
+        .database-fields {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .database-fields h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .database-fields h3::before {
+            content: '📋';
+            font-size: 20px;
+        }
+
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .field-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .field-card:hover {
+            background: white;
+            border-color: #677eea;
+            box-shadow: 0 2px 8px rgba(103, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .field-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .field-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .field-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .field-type {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <div class="settings-header">
+            <button class="back-button" onclick="window.location.href='/'">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
+                </svg>
+                返回主页
+            </button>
+            <h1>设置</h1>
+        </div>
+
+        <div class="settings-card">
+            <h2>
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
+                </svg>
+                Notion 集成配置
+            </h2>
+            <p>
+                配置 Notion Integration Token 和 Database ID，用于保存论文整理到你的 Notion 数据库。
+                如果不填写，将使用服务器 .env 文件中的默认配置。
+            </p>
+
+            <form id="settings-form">
+                <div class="form-group">
+                    <label for="notion-integration-secret">
+                        Notion Integration Secret
+                        <span class="env-source" id="secret-source" style="display: none;"></span>
+                    </label>
+                    <input
+                        type="password"
+                        id="notion-integration-secret"
+                        name="notion_integration_secret"
+                        placeholder="ntn_xxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    >
+                    <div class="hint">
+                        在 Notion 中创建 Integration 后获取，以 "ntn_" 开头
+                        <a href="https://www.notion.so/my-integrations" target="_blank" style="color: #677eea;">创建 Integration</a>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notion-database-id">
+                        Notion Database ID
+                        <span class="env-source" id="database-source" style="display: none;"></span>
+                    </label>
+                    <input
+                        type="text"
+                        id="notion-database-id"
+                        name="notion_database_id"
+                        placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    >
+                    <div class="hint">
+                        在 Notion Database 的 URL 中找到，32 位字符串
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="test-button" id="test-button">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                        </svg>
+                        测试连接
+                    </button>
+                    <button type="submit" class="save-button" id="save-button">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/>
+                        </svg>
+                        保存设置
+                    </button>
+                </div>
+
+                <div class="status-message" id="status-message"></div>
+            </form>
+
+            <!-- 数据库字段信息 -->
+            <div class="database-fields" id="database-fields" style="display: none;">
+                <h3>数据库字段</h3>
+                <div class="fields-grid" id="fields-grid">
+                    <!-- 字段将动态插入这里 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-card">
+            <h2>
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                </svg>
+                说明
+            </h2>
+            <p>
+                <strong>优先级规则：</strong><br>
+                • 如果在这里设置了环境变量，系统将使用这里的配置<br>
+                • 如果这里留空，系统将使用服务器 .env 文件中的默认配置<br>
+                • 设置保存在浏览器本地，不会上传到服务器
+            </p>
+            <p>
+                <strong>安全提示：</strong><br>
+                • Integration Secret 和 Database ID 以加密方式存储在浏览器本地<br>
+                • 请勿与他人分享你的 Notion Integration Secret
+            </p>
+        </div>
+    </div>
+
+    <script src="settings.js?v=1.0"></script>
+</body>
+</html>

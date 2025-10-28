@@ -84,11 +84,41 @@ async def identify_link_type(
                 "message": f"这是arXiv论文链接，已转换为PDF链接: {pdf_url}"
             }, ensure_ascii=False, indent=2)
 
-    # 其他链接
+    # 识别学术期刊/会议网站链接
+    academic_domains = [
+        r'nature\.com',
+        r'science\.org',
+        r'sciencedirect\.com',
+        r'ieee\.org',
+        r'acm\.org',
+        r'springer\.com',
+        r'sciencemag\.org',
+        r'pnas\.org',
+        r'cell\.com',
+        r'aaai\.org',
+        r'openreview\.net',
+        r'arxiv\.org',  # 其他 arxiv 格式
+        r'biorxiv\.org',
+        r'medrxiv\.org',
+        r'doi\.org',
+        r'researchgate\.net',
+        r'semanticscholar\.org',
+        r'google\.com/scholar',
+    ]
+
+    for pattern in academic_domains:
+        if re.search(pattern, url, re.IGNORECASE):
+            return json.dumps({
+                "type": "academic_page",
+                "url": url,
+                "message": "这是学术期刊/会议网站链接，将尝试从页面中提取PDF链接或使用标题搜索论文。"
+            }, ensure_ascii=False, indent=2)
+
+    # 其他链接 - 仍然尝试处理
     return json.dumps({
-        "type": "unknown",
+        "type": "other",
         "url": url,
-        "message": "无法识别的链接类型。可能是论文主页或其他类型，请提供小红书链接或PDF链接。"
+        "message": "这是其他类型的链接，将尝试提取论文信息并查找PDF。"
     }, ensure_ascii=False, indent=2)
 
 
@@ -103,24 +133,31 @@ paper_agent = Agent(
 
 1. **识别链接类型**
    - 使用 identify_link_type 识别用户提供的链接类型
-   - 支持的类型：小红书链接、PDF链接、arXiv链接
+   - 支持的类型：
+     * 小红书链接（xiaohongshu）
+     * PDF链接（直接的 .pdf 文件）
+     * arXiv链接（arxiv.org）
+     * 学术期刊/会议网站链接（academic_page）：Nature, Science, IEEE, ACM, Springer 等
+     * 其他链接（other）：任何其他链接都会尝试处理
 
 2. **转交给 Digest Agent 处理**
    - 使用 transfer_to_digest_agent 将论文整理任务交给专业的 digest_agent
    - 传递必要的信息：链接类型、URL、任何额外的上下文
    - ⚡ **并行处理**：当用户提供多个链接时，你可以并行调用 transfer_to_digest_agent 处理每个链接，无需等待前一个完成
+   - **所有链接类型都应该尝试处理**：即使是 unknown 或 other 类型，也要转交给 digest_agent，让它尝试提取论文信息
 
 ⚠️ 重要提示：
 - 你只负责识别和调度，不直接处理论文整理
 - 论文整理（下载、解析、生成、保存）由 digest_agent 完成
+- **不要拒绝任何链接**：即使无法精确识别类型，也要转交给 digest_agent 尝试处理
 
 工作流程示例：
 
 **单个链接**：
-用户: "帮我整理这篇论文 https://www.xiaohongshu.com/explore/xxx"
+用户: "帮我整理这篇论文 https://www.nature.com/articles/xxx"
 你:
-  1. 调用 identify_link_type -> 识别为小红书链接
-  2. 调用 transfer_to_digest_agent -> 转交给 digest_agent
+  1. 调用 identify_link_type -> 识别为学术期刊链接
+  2. 调用 transfer_to_digest_agent -> 转交给 digest_agent 处理
 
 **多个链接（并行处理）**：
 用户: "帮我整理这三篇论文：链接1、链接2、链接3"

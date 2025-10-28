@@ -529,6 +529,155 @@ async def search_arxiv_pdf(
 
 
 @function_tool
+async def extract_paper_info_from_webpage(
+    webpage_url: Annotated[str, "学术论文网页的URL"]
+) -> str:
+    """
+    从学术期刊/会议网页提取论文信息（标题、作者等）并尝试查找PDF链接
+
+    支持的网站：Nature, Science, IEEE, ACM, Springer 等主流学术期刊和会议
+
+    参数:
+        webpage_url: 学术论文网页的URL
+
+    返回:
+        JSON格式的论文信息（包含标题和可能的PDF链接）
+    """
+    start_time = time.time()
+
+    try:
+        logger.info("🔍 开始从网页提取论文信息", url=webpage_url[:100])
+
+        proxy = os.getenv('http_proxy')
+        mounts = None
+        if proxy:
+            mounts = {
+                "http://": httpx.AsyncHTTPTransport(proxy=proxy),
+                "https://": httpx.AsyncHTTPTransport(proxy=proxy),
+            }
+
+        async with httpx.AsyncClient(
+            timeout=30.0,
+            follow_redirects=True,
+            mounts=mounts,
+            headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+        ) as client:
+            response = await client.get(webpage_url)
+            response.raise_for_status()
+
+            html_content = response.text
+
+            # 使用 BeautifulSoup 解析 HTML（如果可用）
+            try:
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(html_content, 'html.parser')
+
+                # 提取标题
+                title = None
+                title_selectors = [
+                    'h1.c-article-title',  # Nature
+                    'h1[class*="article-title"]',
+                    'h1[class*="ArticleTitle"]',
+                    'meta[name="citation_title"]',
+                    'meta[property="og:title"]',
+                    'title',
+                ]
+
+                for selector in title_selectors:
+                    if selector.startswith('meta'):
+                        elem = soup.find('meta', attrs={'name': selector.split('[name="')[1].rstrip('"]')}) or \
+                               soup.find('meta', attrs={'property': selector.split('[property="')[1].rstrip('"]')})
+                        if elem and elem.get('content'):
+                            title = elem.get('content')
+                            break
+                    else:
+                        elem = soup.select_one(selector)
+                        if elem:
+                            title = elem.get_text(strip=True)
+                            break
+
+                # 提取PDF链接
+                pdf_url = None
+                pdf_patterns = [
+                    r'href="([^"]*\.pdf)"',
+                    r'data-track-action="download pdf"[^>]*href="([^"]*)"',
+                    r'href="([^"]*/pdf/[^"]*)"',
+                ]
+
+                for pattern in pdf_patterns:
+                    import re
+                    matches = re.findall(pattern, html_content, re.IGNORECASE)
+                    if matches:
+                        pdf_url = matches[0]
+                        # 处理相对URL
+                        if pdf_url.startswith('/'):
+                            from urllib.parse import urljoin
+                            pdf_url = urljoin(webpage_url, pdf_url)
+                        break
+
+                elapsed = time.time() - start_time
+
+                if title:
+                    logger.info(
+                        "✅ 网页信息提取成功",
+                        title=title[:100],
+                        has_pdf=bool(pdf_url),
+                        elapsed_time=f"{elapsed:.2f}s"
+                    )
+
+                    return json.dumps({
+                        "success": True,
+                        "title": title,
+                        "pdf_url": pdf_url,
+                        "webpage_url": webpage_url,
+                        "message": f"✅ 提取到论文标题：{title[:100]}" +
+                                 (f"\n找到PDF链接：{pdf_url}" if pdf_url else "\n未找到直接PDF链接，将使用标题搜索")
+                    }, ensure_ascii=False, indent=2)
+                else:
+                    return json.dumps({
+                        "success": False,
+                        "error": "无法从网页提取论文标题"
+                    }, ensure_ascii=False, indent=2)
+
+            except ImportError:
+                # BeautifulSoup 不可用，使用简单的正则提取
+                import re
+                title_match = re.search(r'<title>([^<]+)</title>', html_content, re.IGNORECASE)
+                title = title_match.group(1) if title_match else None
+
+                pdf_match = re.search(r'href="([^"]*\.pdf)"', html_content, re.IGNORECASE)
+                pdf_url = pdf_match.group(1) if pdf_match else None
+
+                if title:
+                    return json.dumps({
+                        "success": True,
+                        "title": title,
+                        "pdf_url": pdf_url,
+                        "webpage_url": webpage_url,
+                        "message": f"✅ 提取到论文信息（基础模式）"
+                    }, ensure_ascii=False, indent=2)
+                else:
+                    return json.dumps({
+                        "success": False,
+                        "error": "无法提取论文信息"
+                    }, ensure_ascii=False, indent=2)
+
+    except Exception as e:
+        elapsed = time.time() - start_time
+        logger.error(
+            "❌ 网页信息提取失败",
+            error=str(e),
+            elapsed_time=f"{elapsed:.2f}s"
+        )
+        return json.dumps({
+            "success": False,
+            "error": f"网页提取失败: {str(e)}"
+        }, ensure_ascii=False, indent=2)
+
+
+@function_tool
 async def download_pdf_from_url(
     pdf_url: Annotated[str, "PDF文件的URL"],
     paper_title: Annotated[str, "论文标题（用于命名文件）"] = "paper"
@@ -1437,7 +1586,7 @@ async def save_digest_to_notion(
 
     try:
         logger.info("💾 开始保存论文整理到 Notion", paper_title=paper_title[:100])
-        client = AsyncClient(auth=os.getenv('NOTION_TOKEN'))
+        client = AsyncClient(auth=os.getenv('NOTION_INTEGRATION_SECRET'))
 
         # 构建 properties
         properties = {
@@ -1648,11 +1797,11 @@ async def _markdown_to_notion_blocks_with_images(markdown_text: str) -> list:
         image_upload_map = {}
         failed_images = []
 
-        notion_token = os.getenv('NOTION_TOKEN')
-        if notion_token and images_dir:
+        notion_integration_secret = os.getenv('NOTION_INTEGRATION_SECRET')
+        if notion_integration_secret and images_dir:
             try:
                 logger.info("开始上传提取的图片到 Notion")
-                uploader = NotionImageUploader(notion_token)
+                uploader = NotionImageUploader(notion_integration_secret)
 
                 # 准备图片文件列表
                 images_to_upload = [
@@ -1750,9 +1899,11 @@ digest_agent = Agent(
    - 如果提供了小红书 URL，使用 fetch_xiaohongshu_post 获取内容
    - 如果提供了 PDF URL，使用 download_pdf_from_url 下载
    - 如果提供了本地 PDF 路径，使用 read_local_pdf 读取
+   - **如果提供了学术网页链接**（academic_page 或 other 类型），使用 extract_paper_info_from_webpage 提取论文信息
 
 2. **搜索论文 PDF**（如果没有提供 PDF URL）
-   - 优先使用 search_arxiv_pdf 在 arXiv 搜索论文
+   - 如果从网页提取到了标题但没有PDF，使用标题在 search_arxiv_pdf 搜索
+   - 如果网页提取失败，尝试使用 search_arxiv_pdf 搜索（需要先推测标题）
    - 从搜索结果中获取 PDF URL 和 arXiv ID
 
 3. **⚡ 一次 LLM 调用提取所有元数据**（替代旧的两个单独调用）
@@ -1808,6 +1959,7 @@ digest_agent = Agent(
     model=get_reason_model(),
     tools=[
         fetch_xiaohongshu_post,
+        extract_paper_info_from_webpage,  # ✨ 新增：从学术网页提取信息
         search_arxiv_pdf,
         download_pdf_from_url,
         read_local_pdf,
