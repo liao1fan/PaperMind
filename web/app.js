@@ -662,7 +662,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetchModelInfo();
     console.log(`[性能] 获取模型信息耗时: ${(performance.now() - modelStart).toFixed(2)}ms`);
 
-    console.log(`[性能] ===== 页面初始化总耗时: ${(performance.now() - perfStart).toFixed(2)}ms =====`);
+    const totalTime = performance.now() - perfStart;
+    console.log(`[性能] ===== 页面初始化总耗时: ${totalTime.toFixed(2)}ms =====`);
+
+    // 将性能数据发送到后端日志
+    try {
+        await fetch('/api/performance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                page: 'index',
+                metrics: {
+                    '检查认证耗时': `${(performance.now() - perfStart).toFixed(2)}ms`,
+                    '初始化用户信息耗时': `${(performance.now() - infoStart).toFixed(2)}ms`,
+                    '加载会话列表耗时': `${(performance.now() - loadStart).toFixed(2)}ms`,
+                    '渲染会话列表耗时': `${(performance.now() - renderStart).toFixed(2)}ms`,
+                    '恢复消息耗时': `${(performance.now() - msgStart).toFixed(2)}ms`,
+                    'WebSocket连接耗时': `${(performance.now() - wsStart).toFixed(2)}ms`,
+                    '获取模型信息耗时': `${(performance.now() - modelStart).toFixed(2)}ms`,
+                    '总初始化耗时': `${totalTime.toFixed(2)}ms`
+                }
+            })
+        });
+    } catch (error) {
+        console.error('发送性能日志失败:', error);
+    }
 });
 
 // 获取模型信息
