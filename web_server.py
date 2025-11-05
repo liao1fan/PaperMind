@@ -917,19 +917,6 @@ async def initialize_notion_database(request: NotionTestRequest):
             "error": str(e)
         }
 
-@app.post("/api/performance")
-async def log_performance(data: dict):
-    """接收前端性能日志"""
-    try:
-        metrics = data.get("metrics", {})
-        logger.info(f"[前端性能] 页面: {data.get('page', 'unknown')}")
-        for key, value in metrics.items():
-            logger.info(f"[前端性能] {key}: {value}")
-        return {"success": True}
-    except Exception as e:
-        logger.error(f"记录性能日志失败: {e}")
-        return {"success": False, "error": str(e)}
-
 @app.get("/health")
 async def health_check():
     """健康检查端点"""
