@@ -9,8 +9,14 @@ from typing import Optional, Dict
 from passlib.context import CryptContext
 import jwt
 
-# 密码哈希配置（使用 argon2 而不是 bcrypt，避免 bcrypt 的初始化问题）
-pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+# 密码哈希配置（使用 argon2 但降低计算复杂度以提升低配置服务器性能）
+pwd_context = CryptContext(
+    schemes=["argon2"],
+    deprecated="auto",
+    argon2__time_cost=1,        # 降低时间成本（默认2）
+    argon2__memory_cost=8192,   # 降低内存使用（默认102400）
+    argon2__parallelism=1       # 降低并行度（默认8）
+)
 
 # JWT 配置
 JWT_SECRET = os.getenv("JWT_SECRET", "your-secret-key-change-in-production")
