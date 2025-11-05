@@ -586,20 +586,32 @@ function renderMessage(role, content) {
 
 // 初始化
 document.addEventListener('DOMContentLoaded', async () => {
+    const perfStart = performance.now();
+    console.log('[性能] 页面DOM加载完成，开始初始化');
+
     // 检查认证状态
     checkAuthentication();
+    console.log(`[性能] checkAuthentication 耗时: ${(performance.now() - perfStart).toFixed(2)}ms`);
 
     // 初始化用户信息
+    const infoStart = performance.now();
     initUserInfo();
+    console.log(`[性能] initUserInfo 耗时: ${(performance.now() - infoStart).toFixed(2)}ms`);
 
     // 加载会话列表
+    const loadStart = performance.now();
     loadConversationList();
+    console.log(`[性能] loadConversationList 耗时: ${(performance.now() - loadStart).toFixed(2)}ms`);
 
     // 渲染会话列表
+    const renderStart = performance.now();
     renderConversationList();
+    console.log(`[性能] renderConversationList 耗时: ${(performance.now() - renderStart).toFixed(2)}ms`);
 
     // 恢复之前的消息
+    const msgStart = performance.now();
     loadMessagesFromStorage();
+    console.log(`[性能] loadMessagesFromStorage 耗时: ${(performance.now() - msgStart).toFixed(2)}ms`);
 
     // 确保当前会话在列表中
     const currentConversation = state.conversations.find(c => c.id === state.sessionId);
@@ -639,10 +651,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // 建立 WebSocket 连接
+    const wsStart = performance.now();
+    console.log('[性能] 开始建立WebSocket连接...');
     await connectWebSocket();
+    console.log(`[性能] WebSocket连接耗时: ${(performance.now() - wsStart).toFixed(2)}ms`);
 
     // 获取模型信息
-    fetchModelInfo();
+    const modelStart = performance.now();
+    console.log('[性能] 开始获取模型信息...');
+    await fetchModelInfo();
+    console.log(`[性能] 获取模型信息耗时: ${(performance.now() - modelStart).toFixed(2)}ms`);
+
+    console.log(`[性能] ===== 页面初始化总耗时: ${(performance.now() - perfStart).toFixed(2)}ms =====`);
 });
 
 // 获取模型信息
