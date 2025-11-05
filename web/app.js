@@ -463,6 +463,7 @@ const elements = {
     welcomeMessage: document.getElementById('welcome-message'),
     messageInput: document.getElementById('message-input'),
     sendBtn: document.getElementById('send-btn'),
+    stopBtn: document.getElementById('stop-btn'),
     newChatBtn: document.getElementById('new-chat-btn'),
     chatHistory: document.getElementById('chat-history'),
     modelName: document.getElementById('model-name'),
@@ -609,6 +610,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 绑定事件
     elements.sendBtn.addEventListener('click', handleSend);
+    elements.stopBtn.addEventListener('click', handleStop);
     elements.newChatBtn.addEventListener('click', newChat);
 
     // 点击输入框任何位置都能触发输入焦点
@@ -721,6 +723,11 @@ function handleWebSocketMessage(data) {
 
         case 'done':
             state.processing = false;
+
+            // 切换按钮显示：显示发送按钮，隐藏停止按钮
+            elements.sendBtn.classList.remove('hidden');
+            elements.stopBtn.classList.add('hidden');
+
             elements.sendBtn.disabled = false;
             elements.messageInput.disabled = false;
             elements.messageInput.focus();
@@ -735,6 +742,42 @@ function handleWebSocketMessage(data) {
 function handleInput() {
     const value = elements.messageInput.value.trim();
     elements.sendBtn.disabled = !value || state.processing;
+}
+
+// 处理停止按钮
+async function handleStop() {
+    if (!state.processing) return;
+
+    console.log('用户请求停止处理');
+
+    // 立即更新UI状态
+    state.processing = false;
+    removeTypingIndicator();
+
+    // 切换按钮显示
+    elements.stopBtn.classList.add('hidden');
+    elements.sendBtn.classList.remove('hidden');
+
+    // 重新启用输入
+    elements.sendBtn.disabled = false;
+    elements.messageInput.disabled = false;
+    elements.messageInput.focus();
+
+    // 添加提示消息
+    addMessage('assistant', '已停止处理。');
+
+    // 通知后端取消任务（可选）
+    try {
+        await fetch('/api/cancel-chat', {
+            method: 'POST',
+            headers: getApiHeaders(),
+            body: JSON.stringify({
+                session_id: state.sessionId
+            })
+        });
+    } catch (error) {
+        console.error('通知后端取消任务失败:', error);
+    }
 }
 
 // 发送消息
@@ -754,8 +797,11 @@ async function handleSend() {
     // 清空输入框
     elements.messageInput.value = '';
     elements.messageInput.style.height = 'auto';
-    elements.sendBtn.disabled = true;
     elements.messageInput.disabled = true;
+
+    // 切换按钮显示：隐藏发送按钮，显示停止按钮
+    elements.sendBtn.classList.add('hidden');
+    elements.stopBtn.classList.remove('hidden');
 
     // 显示输入中状态
     state.processing = true;
@@ -798,6 +844,11 @@ async function handleSend() {
         removeTypingIndicator();
         addMessage('assistant', `抱歉，发生错误：${error.message}`);
         state.processing = false;
+
+        // 切换按钮显示：显示发送按钮，隐藏停止按钮
+        elements.sendBtn.classList.remove('hidden');
+        elements.stopBtn.classList.add('hidden');
+
         elements.sendBtn.disabled = false;
         elements.messageInput.disabled = false;
     }

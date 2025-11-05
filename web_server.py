@@ -246,6 +246,9 @@ class RestoreSessionRequest(BaseModel):
     session_id: str
     messages: list
 
+class CancelChatRequest(BaseModel):
+    session_id: str
+
 class DigestResponse(BaseModel):
     success: bool
     message: str
@@ -768,6 +771,25 @@ async def reset_session(request: ResetSessionRequest):
         return {"success": True, "message": f"会话 {session_id} 已重置"}
     except Exception as e:
         logger.error(f"重置会话失败: {e}")
+        return {"success": False, "error": str(e)}
+
+@app.post("/api/cancel-chat")
+async def cancel_chat(request: CancelChatRequest):
+    """
+    取消正在进行的聊天处理
+    """
+    try:
+        session_id = request.session_id
+        logger.info(f"收到取消请求: session_id={session_id}")
+
+        # 发送取消信号到前端
+        await manager.broadcast({
+            "type": "done"
+        })
+
+        return {"success": True, "message": "处理已取消"}
+    except Exception as e:
+        logger.error(f"取消聊天失败: {e}")
         return {"success": False, "error": str(e)}
 
 @app.post("/api/restore-session")
