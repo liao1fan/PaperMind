@@ -62,28 +62,44 @@ class AuthResponse(BaseModel):
 @router.post("/register", response_model=AuthResponse)
 async def register(req: RegisterRequest):
     """用户注册"""
+    import time
+    start_time = time.time()
+    logger.info(f"[性能] 开始处理注册请求: {req.username}")
+
     session = get_session(engine)
+    logger.info(f"[性能] 获取数据库会话耗时: {time.time() - start_time:.3f}s")
 
     try:
         # 检查用户是否已存在
+        query_start = time.time()
         existing_user = session.query(User).filter(User.username == req.username).first()
+        logger.info(f"[性能] 查询用户是否存在耗时: {time.time() - query_start:.3f}s")
+
         if existing_user:
             raise HTTPException(status_code=400, detail="用户名已存在")
 
         # 创建新用户
+        hash_start = time.time()
         password_hash = PasswordManager.hash_password(req.password)
+        logger.info(f"[性能] 密码哈希耗时: {time.time() - hash_start:.3f}s")
+
         user = User(
             username=req.username,
             password_hash=password_hash,
         )
+
+        db_start = time.time()
         session.add(user)
         session.commit()
         session.refresh(user)
+        logger.info(f"[性能] 数据库提交耗时: {time.time() - db_start:.3f}s")
 
         # 生成 Token
+        token_start = time.time()
         token = TokenManager.create_token(user.id, user.username)
+        logger.info(f"[性能] 生成Token耗时: {time.time() - token_start:.3f}s")
 
-        logger.info(f"✅ 用户注册成功: {req.username}")
+        logger.info(f"✅ 用户注册成功: {req.username}, 总耗时: {time.time() - start_time:.3f}s")
 
         return AuthResponse(
             success=True,
@@ -105,22 +121,34 @@ async def register(req: RegisterRequest):
 @router.post("/login", response_model=AuthResponse)
 async def login(req: LoginRequest):
     """用户登录"""
+    import time
+    start_time = time.time()
+    logger.info(f"[性能] 开始处理登录请求: {req.username}")
+
     session = get_session(engine)
+    logger.info(f"[性能] 获取数据库会话耗时: {time.time() - start_time:.3f}s")
 
     try:
         # 查找用户
+        query_start = time.time()
         user = session.query(User).filter(User.username == req.username).first()
+        logger.info(f"[性能] 查询用户耗时: {time.time() - query_start:.3f}s")
+
         if not user:
             raise HTTPException(status_code=401, detail="用户不存在或密码错误")
 
         # 验证密码
+        verify_start = time.time()
         if not PasswordManager.verify_password(req.password, user.password_hash):
             raise HTTPException(status_code=401, detail="用户不存在或密码错误")
+        logger.info(f"[性能] 验证密码耗时: {time.time() - verify_start:.3f}s")
 
         # 生成 Token
+        token_start = time.time()
         token = TokenManager.create_token(user.id, user.username)
+        logger.info(f"[性能] 生成Token耗时: {time.time() - token_start:.3f}s")
 
-        logger.info(f"✅ 用户登录成功: {req.username}")
+        logger.info(f"✅ 用户登录成功: {req.username}, 总耗时: {time.time() - start_time:.3f}s")
 
         return AuthResponse(
             success=True,
