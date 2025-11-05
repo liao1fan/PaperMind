@@ -9,13 +9,12 @@ from typing import Optional, Dict
 from passlib.context import CryptContext
 import jwt
 
-# 密码哈希配置（使用 argon2 但降低计算复杂度以提升低配置服务器性能）
+# 密码哈希配置（使用 bcrypt，在低配置服务器上速度更快）
+# bcrypt 比 argon2 更快，且对低配置服务器更友好
 pwd_context = CryptContext(
-    schemes=["argon2"],
+    schemes=["bcrypt", "argon2"],  # bcrypt 优先，argon2 作为后备（用于验证旧密码）
     deprecated="auto",
-    argon2__time_cost=1,        # 降低时间成本（默认2）
-    argon2__memory_cost=8192,   # 降低内存使用（默认102400）
-    argon2__parallelism=1       # 降低并行度（默认8）
+    bcrypt__rounds=10  # bcrypt 轮数（默认12，降低到10以提升速度）
 )
 
 # JWT 配置
